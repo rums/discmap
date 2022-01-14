@@ -1,0 +1,20 @@
+<script>window.followUsername = "<%= @follow.username %>"</script>
+
+<h1>Show Follow</h1>
+
+<ul>
+
+  <li>
+    <strong>Username:</strong>
+    <%= @follow.username %>
+  </li>
+  
+  <li>
+    <div id="messages" role="log" aria-live="polite"></div>
+    <input id="chat-input" type="text">
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.follow_path(@conn, :edit, @follow) %></span> |
+<span><%= link "Back", to: Routes.follow_path(@conn, :index) %></span>

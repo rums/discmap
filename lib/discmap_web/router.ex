@@ -22,6 +22,8 @@ defmodule DiscmapWeb.Router do
     resources "/users", UserController
 
     resources "/maps", MapController
+
+    resources "/follows", FollowController
   end
 
   # Other scopes may use custom stacks.
