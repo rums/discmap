@@ -20,6 +20,8 @@ defmodule DiscmapWeb.Router do
     get "/", PageController, :index
 
     resources "/users", UserController
+
+    resources "/maps", MapController
   end
 
   # Other scopes may use custom stacks.
