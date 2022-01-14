@@ -63,25 +63,32 @@ let chatInput         = document.querySelector("#chat-input")
 let messagesContainer = document.querySelector("#messages")
 chatInput.addEventListener("keypress", event => {
   if(event.key === 'Enter'){
-    channel.push("new_msg", {body: chatInput.value})
+    channel.push("mud_msg", {body: {room_short: chatInput.value, x: 200, y: 200}})
     chatInput.value = ""
   }
 })
 
-channel.on("new_msg", payload => {
+channel.on("mud_msg", payload => {
+  let src = payload.body.src;
+  let x = 340;
+  let y = 32;
+  let unitX = 14;
+  let unitY = 14;
+  let centerX = payload.body.centerX;
+  let centerY = payload.body.centerY;
   let messageItem = document.createElement("canvas")
   // load image from payload.body.src and draw it on the canvas
   let ctx = messageItem.getContext("2d")
   let img = new Image()
   img.src = payload.body.src
   img.onload = () => {
-    messageItem.width = 300
-    messageItem.height = 300
+    messageItem.width = img.width
+    messageItem.height = img.height
     // ctx.scale(300 / img.width, 300 / img.height)
     ctx.drawImage(img, 0, 0)
     // draw red circle on the canvas at x = body.x, y = body.y
     ctx.beginPath()
-    ctx.arc(payload.body.x, payload.body.y, 10, 0, 2 * Math.PI)
+    ctx.arc(x, y, 10, 0, 2 * Math.PI)
     ctx.fillStyle = "red"
     ctx.fill()
     messagesContainer.appendChild(messageItem)

@@ -12,12 +12,48 @@ defmodule DiscmapWeb.UserMapChannel do
 
   @impl true
   def handle_in("new_msg", %{"body" => body}, socket) do
-    broadcast!(socket, "new_msg", %{body: %{
-      src: body,
-      x: 200,
-      y: 200
-    }})
+    broadcast!(socket, "new_msg", %{
+      body: %{
+        src: body,
+        x: 200,
+        y: 200
+      }
+    })
+
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_in(
+        "mud_msg",
+        %{
+          "body" => %{
+            "room_short" => room_short,
+            "x" => x,
+            "y" => y
+          }
+        },
+        socket
+      ) do
+    # TODO: do some processing server side
+    result = get_map_data(room_short, x, y)
+    # return data for map to display
+    broadcast!(socket, "mud_msg", %{
+      body: %{
+        src: result.src,
+        x: result.x,
+        y: result.y
+      }
+    })
+
+    {:noreply, socket}
+  end
+
+  def get_map_data(_room_short, x, y) do
+    %{src: "/images/am.png",
+      x: x,
+      y: y
+    }
   end
 
   # Channels can be used in a request/response fashion

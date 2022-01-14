@@ -8,7 +8,7 @@
 import Config
 
 config :discmap,
-  ecto_repos: [Discmap.Repo]
+  ecto_repos: [Discmap.Repo, Discmap.QuowRepo]
 
 # Configures the endpoint
 config :discmap, DiscmapWeb.Endpoint,

@@ -1,0 +1,1 @@
+CREATE TABLE room_descriptions (room_hash TEXT NOT NULL DEFAULT '',room_id TEXT NOT NULL DEFAULT '',PRIMARY KEY (room_hash));
