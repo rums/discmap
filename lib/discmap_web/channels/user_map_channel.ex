@@ -50,7 +50,7 @@ defmodule DiscmapWeb.UserMapChannel do
   end
 
   def get_map_data(_room_short, x, y) do
-    %{src: "/images/am.png",
+    %{src: "/images/mapfiles/am.png",
       x: x,
       y: y
     }
