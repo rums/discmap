@@ -1,6 +1,9 @@
 defmodule DiscmapWeb.UserMapChannel do
   use DiscmapWeb, :channel
 
+  alias Discmap.Maps
+  alias Discmap.Maps.Room
+
   @impl true
   def join("user_map:" <> username, payload, socket) do
     if authorized?(payload) do
@@ -41,6 +44,7 @@ defmodule DiscmapWeb.UserMapChannel do
     broadcast!(socket, "mud_msg", %{
       body: %{
         src: result.src,
+        room_short: result.room_short,
         x: result.x,
         y: result.y
       }
@@ -49,10 +53,14 @@ defmodule DiscmapWeb.UserMapChannel do
     {:noreply, socket}
   end
 
-  def get_map_data(_room_short, x, y) do
-    %{src: "/images/mapfiles/am.png",
-      x: x,
-      y: y
+  def get_map_data(room_short, _x, _y) do
+    # get room by room_short
+    room = Maps.get_room_by_room_short!(room_short)
+    map = Maps.get_map_by_map_id!(room.map_id)
+    %{src: map.filepath,
+      room_short: room.room_short,
+      x: room.xpos,
+      y: room.ypos
     }
   end
 

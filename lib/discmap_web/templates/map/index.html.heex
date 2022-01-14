@@ -5,6 +5,7 @@
     <tr>
       <th>Name</th>
       <th>Filepath</th>
+      <th>MapId</th>
 
       <th></th>
     </tr>
@@ -14,6 +15,7 @@
     <tr>
       <td><%= map.name %></td>
       <td><%= map.filepath %></td>
+      <td><%= map.map_id %></td>
 
       <td>
         <span><%= link "Show", to: Routes.map_path(@conn, :show, map) %></span>

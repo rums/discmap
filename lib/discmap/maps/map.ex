@@ -5,6 +5,7 @@ defmodule Discmap.Maps.Map do
   schema "maps" do
     field :filepath, :string
     field :name, :string
+    field :map_id, :string
 
     timestamps()
   end

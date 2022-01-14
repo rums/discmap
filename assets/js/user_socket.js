@@ -70,30 +70,34 @@ chatInput.addEventListener("keypress", event => {
 
 channel.on("mud_msg", payload => {
   let src = payload.body.src;
-  let x = 340;
-  let y = 32;
-  let unitX = 14;
-  let unitY = 14;
-  let centerX = payload.body.centerX;
-  let centerY = payload.body.centerY;
-  let messageItem = document.createElement("canvas")
+  let x = payload.body.x;
+  let y = payload.body.y;
+  let messageItem = document.createElement("div")
+  let roomShort = document.createElement("strong")
+  roomShort.innerText = payload.body.room_short
+  messageItem.append(roomShort)
+  let cvs = document.createElement("canvas")
   // load image from payload.body.src and draw it on the canvas
-  let ctx = messageItem.getContext("2d")
+  let ctx = cvs.getContext("2d")
   let img = new Image()
-  img.src = payload.body.src
+  img.src = src
   img.onload = () => {
-    messageItem.width = img.width
-    messageItem.height = img.height
+    let width = 500;
+    let height = 500;
+    cvs.width = width
+    cvs.height = height
     // ctx.scale(300 / img.width, 300 / img.height)
+    ctx.translate((width / 2) - x, (height / 2) - y)
     ctx.drawImage(img, 0, 0)
     // draw red circle on the canvas at x = body.x, y = body.y
     ctx.beginPath()
-    ctx.arc(x, y, 10, 0, 2 * Math.PI)
+    ctx.arc(x, y, 6, 0, 2 * Math.PI)
     ctx.fillStyle = "red"
     ctx.fill()
+    // center the canvas at x, y
+    messageItem.append(cvs)
     messagesContainer.appendChild(messageItem)
   }
-  messagesContainer.appendChild(messageItem)
 })
 
 export default socket
