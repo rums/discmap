@@ -31,15 +31,13 @@ defmodule DiscmapWeb.UserMapChannel do
         "mud_msg",
         %{
           "body" => %{
-            "room_short" => room_short,
-            "x" => x,
-            "y" => y
+            "room_short" => room_short
           }
         },
         socket
       ) do
     # TODO: do some processing server side
-    result = get_map_data(room_short, x, y)
+    result = get_map_data(room_short)
     # return data for map to display
     broadcast!(socket, "mud_msg", %{
       body: %{
@@ -53,9 +51,12 @@ defmodule DiscmapWeb.UserMapChannel do
     {:noreply, socket}
   end
 
-  def get_map_data(room_short, _x, _y) do
-    # get room by room_short
-    room = Maps.get_room_by_room_short!(room_short)
+  def get_map_data(room_short) do
+    room = if room_short == "random" do
+        Maps.get_random_room()
+      else
+        Maps.get_room_by_room_short!(room_short)
+      end
     map = Maps.get_map_by_map_id!(room.map_id)
     %{src: map.filepath,
       room_short: room.room_short,

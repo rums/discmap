@@ -170,4 +170,17 @@ defmodule Discmap.Maps do
     # return first matching result
     Repo.one(from(Room, where: [room_short: ^room_short], limit: 1))
   end
+
+  @doc """
+  Gets a random room.
+
+  ## Examples
+
+      iex> get_random_room()
+      %Room{}
+  """
+  def get_random_room do
+    Repo.one(from(Room, limit: 1, order_by: fragment("RANDOM()")))
+  end
+
 end

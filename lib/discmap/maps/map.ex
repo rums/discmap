@@ -6,6 +6,8 @@ defmodule Discmap.Maps.Map do
     field :filepath, :string
     field :name, :string
     field :map_id, :string
+    field :unit_x, :integer
+    field :unit_y, :integer
 
     timestamps()
   end

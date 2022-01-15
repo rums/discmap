@@ -59,12 +59,11 @@ channel.join()
   .receive("ok", resp => { console.log("Joined successfully", resp) })
   .receive("error", resp => { console.log("Unable to join", resp) })
 
-let chatInput         = document.querySelector("#chat-input")
-let messagesContainer = document.querySelector("#messages")
-chatInput.addEventListener("keypress", event => {
+let shortroomInput         = document.querySelector("#shortroom-input")
+shortroomInput.addEventListener("keypress", event => {
   if(event.key === 'Enter'){
-    channel.push("mud_msg", {body: {room_short: chatInput.value, x: 200, y: 200}})
-    chatInput.value = ""
+    channel.push("mud_msg", {body: {room_short: shortroomInput.value}})
+    shortroomInput.value = ""
   }
 })
 
@@ -72,31 +71,30 @@ channel.on("mud_msg", payload => {
   let src = payload.body.src;
   let x = payload.body.x;
   let y = payload.body.y;
-  let messageItem = document.createElement("div")
-  let roomShort = document.createElement("strong")
-  roomShort.innerText = payload.body.room_short
-  messageItem.append(roomShort)
-  let cvs = document.createElement("canvas")
+  let followsRoom = document.getElementById("follows-room-name")
+  followsRoom.innerText = payload.body.room_short
+  let followsMap = document.getElementById("follows-map")
   // load image from payload.body.src and draw it on the canvas
-  let ctx = cvs.getContext("2d")
+  let ctx = followsMap.getContext("2d")
   let img = new Image()
   img.src = src
   img.onload = () => {
     let width = 500;
     let height = 500;
-    cvs.width = width
-    cvs.height = height
+    followsMap.width = width
+    followsMap.height = height
     // ctx.scale(300 / img.width, 300 / img.height)
     ctx.translate((width / 2) - x, (height / 2) - y)
     ctx.drawImage(img, 0, 0)
     // draw red circle on the canvas at x = body.x, y = body.y
+    // give the circle a black border
     ctx.beginPath()
-    ctx.arc(x, y, 6, 0, 2 * Math.PI)
+    ctx.arc(x, y, 5, 0, 2 * Math.PI)
     ctx.fillStyle = "red"
     ctx.fill()
-    // center the canvas at x, y
-    messageItem.append(cvs)
-    messagesContainer.appendChild(messageItem)
+    ctx.lineWidth = 1
+    ctx.strokeStyle = "black"
+    ctx.stroke()
   }
 })
 

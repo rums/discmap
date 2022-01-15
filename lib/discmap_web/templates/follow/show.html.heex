@@ -9,12 +9,16 @@
     <%= @follow.username %>
   </li>
   
-  <li>
-    <div id="messages" role="log" aria-live="polite"></div>
-    <input id="chat-input" type="text">
-  </li>
-
 </ul>
+<div id="follows-log" role="log" aria-live="polite">
+  <div>
+    <strong id="follows-room-name"></strong>
+  </div>
+  <div>
+    <canvas id="follows-map" width="500" height="500"></canvas>
+  </div>
+</div>
+<input id="shortroom-input" type="text">
 
 <span><%= link "Edit", to: Routes.follow_path(@conn, :edit, @follow) %></span> |
 <span><%= link "Back", to: Routes.follow_path(@conn, :index) %></span>
