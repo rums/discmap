@@ -13,6 +13,6 @@ defmodule Discmap.Accounts.User do
   def changeset(user, attrs) do
     user
     |> cast(attrs, [:name, :current_room_id])
-    |> validate_required([:name, :current_room_id])
+    |> validate_required([:name])
   end
 end
