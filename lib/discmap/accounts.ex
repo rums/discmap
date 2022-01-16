@@ -51,7 +51,7 @@ defmodule Discmap.Accounts do
         ** (Ecto.NoResultsError)
   """
   def get_user_by_username!(username) do
-    Repo.one(User, where: [username: username])
+    Repo.one(from(User, where: [username: ^username]))
   end
 
   @doc """
