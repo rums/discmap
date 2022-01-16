@@ -38,6 +38,23 @@ defmodule Discmap.Accounts do
   def get_user!(id), do: Repo.get!(User, id)
 
   @doc """
+    Gets a single user based on the username.
+
+    Raises `Ecto.NoResultsError` if the User does not exist.
+
+    ## Examples
+
+        iex> get_user_by_username!("joe")
+        %User{}
+
+        iex> get_user_by_username!("bob")
+        ** (Ecto.NoResultsError)
+  """
+  def get_user_by_username!(username) do
+    Repo.one(User, where: [username: username])
+  end
+
+  @doc """
   Creates a user.
 
   ## Examples

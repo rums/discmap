@@ -15,7 +15,7 @@ defmodule Discmap.Maps.Map do
   @doc false
   def changeset(map, attrs) do
     map
-    |> cast(attrs, [:name, :filepath])
-    |> validate_required([:name, :filepath])
+    |> cast(attrs, [:name, :filepath, :map_id, :unit_x, :unit_y])
+    |> validate_required([:name, :filepath, :map_id, :unit_x, :unit_y])
   end
 end

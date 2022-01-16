@@ -2,7 +2,7 @@ defmodule DiscmapWeb.UserMapChannel do
   use DiscmapWeb, :channel
 
   alias Discmap.Maps
-  alias Discmap.Maps.Room
+  alias Discmap.Accounts
 
   @impl true
   def join("user_map:" <> username, payload, socket) do
@@ -31,53 +31,116 @@ defmodule DiscmapWeb.UserMapChannel do
         "mud_msg",
         %{
           "body" => %{
+            "username" => username,
+            "direction" => direction
+          }
+        },
+        socket
+      ) do
+    case change_room(username, direction) do
+      {:result, result} ->
+        broadcast!(socket, "mud_msg", %{
+          body: %{
+            src: result.map.filepath,
+            room_short: result.room.room_short,
+            x: result.room.xpos,
+            y: result.room.ypos
+          }
+        })
+
+        {:noreply, socket}
+
+      {:error, _any} ->
+        {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_in(
+        "mud_msg",
+        %{
+          "body" => %{
+            "username" => username,
             "room_short" => room_short
           }
         },
         socket
       ) do
-    # TODO: do some processing server side
-    result = get_map_data(room_short)
-    # return data for map to display
-    broadcast!(socket, "mud_msg", %{
-      body: %{
-        src: result.src,
-        room_short: result.room_short,
-        x: result.x,
-        y: result.y
-      }
-    })
+    case set_room(username, room_short) do
+      {:result, result} ->
+        broadcast!(socket, "mud_msg", %{
+          body: %{
+            src: result.map.filepath,
+            room_short: result.room.room_short,
+            x: result.room.xpos,
+            y: result.room.ypos
+          }
+        })
 
-    {:noreply, socket}
+        {:noreply, socket}
+
+      {:error, _any} ->
+        {:noreply, socket}
+    end
   end
 
-  def get_map_data(room_short) do
-    room = if room_short == "random" do
-        Maps.get_random_room()
-      else
+  def set_room(username, room_short) do
+    user = Accounts.get_user_by_username!(username)
+
+    sent_room =
+      if room_short != nil do
         Maps.get_room_by_room_short!(room_short)
       end
-    map = Maps.get_map_by_map_id!(room.map_id)
-    %{src: map.filepath,
-      room_short: room.room_short,
-      x: room.xpos,
-      y: room.ypos
-    }
+
+    if sent_room != nil do
+      Accounts.update_user(user, %{
+        current_room_id: sent_room.room_id
+      })
+
+      map = Maps.get_map_by_map_id!(sent_room.map_id)
+      {:result, %{map: map, room: sent_room}}
+    else
+      {:error, %{reason: "room_short not found"}}
+    end
   end
 
-  # Channels can be used in a request/response fashion
-  # by sending replies to requests from the client
-  @impl true
-  def handle_in("ping", payload, socket) do
-    {:reply, {:ok, payload}, socket}
-  end
+  @spec change_room(any, any) ::
+          nil
+          | {:error, %{reason: <<_::112>>}}
+          | {:result,
+             %{map: any, room: atom | %{:map_id => any, :room_id => any, optional(any) => any}}}
+  def change_room(username, direction) do
+    abbr_direction = case direction do
+      "north" -> "n"
+      "south" -> "s"
+      "east" -> "e"
+      "west" -> "w"
+      "northwest" -> "nw"
+      "northeast" -> "ne"
+      "southwest" -> "sw"
+      "southeast" -> "se"
+      "up" -> "u"
+      "down" -> "d"
+      _ -> direction
+    end
+    user = Accounts.get_user_by_username!(username)
 
-  # It is also common to receive messages from the client and
-  # broadcast to everyone in the current topic (user_map:lobby).
-  @impl true
-  def handle_in("shout", payload, socket) do
-    broadcast(socket, "shout", payload)
-    {:noreply, socket}
+    if user.current_room_id != nil do
+      room = Maps.get_connected_room(user.current_room_id, abbr_direction)
+
+      if room != nil do
+        # update user current room in repo
+        Accounts.update_user(user, %{
+          current_room_id: room.room_id
+        })
+
+        map = Maps.get_map_by_map_id!(room.map_id)
+
+        {:result, %{map: map, room: room}}
+      else
+        {:error, %{reason: "room not found"}}
+      end
+    end
   end
 
   # Add authorization logic here as required.

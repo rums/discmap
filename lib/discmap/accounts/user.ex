@@ -4,6 +4,7 @@ defmodule Discmap.Accounts.User do
 
   schema "users" do
     field :name, :string
+    field :current_room_id, :string
 
     timestamps()
   end
@@ -11,7 +12,7 @@ defmodule Discmap.Accounts.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:name])
-    |> validate_required([:name])
+    |> cast(attrs, [:name, :current_room_id])
+    |> validate_required([:name, :current_room_id])
   end
 end

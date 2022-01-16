@@ -8,6 +8,7 @@ defmodule Discmap.Maps do
 
   alias Discmap.Maps.Map
   alias Discmap.Maps.Room
+  alias Discmap.Maps.RoomExit
 
   @doc """
   Returns the list of maps.
@@ -181,6 +182,23 @@ defmodule Discmap.Maps do
   """
   def get_random_room do
     Repo.one(from(Room, limit: 1, order_by: fragment("RANDOM()")))
+  end
+
+  @doc """
+  Get connected room using room_id and exit.
+
+  ## Examples
+
+      iex> get_connected_room(room_id, exit)
+      %Room{}
+  """
+  def get_connected_room(room_id, dir) do
+    connect_room = Repo.one(from(RoomExit, where: [room_id: ^room_id, exit: ^dir], select: [:connect_id]))
+    if connect_room != nil and connect_room.connect_id != nil do
+      Repo.one(from(Room, where: [room_id: ^connect_room.connect_id], limit: 1))
+    else
+      nil
+    end
   end
 
 end
