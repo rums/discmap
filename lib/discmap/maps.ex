@@ -167,9 +167,16 @@ defmodule Discmap.Maps do
       ** (Ecto.NoResultsError)
 
   """
-  def get_room_by_room_short!(room_short) do
-    # return first matching result
-    Repo.one(from(Room, where: [room_short: ^room_short], limit: 1))
+  def get_room_by_room_short!(room_short, unique?) do
+    query = from r in Room,
+              where: r.room_short == ^room_short,
+              select: r
+    result = Repo.all(query)
+    if (result == nil) or (unique? and length(result) > 1) or (length(result) == 0) do
+      nil
+    else
+      hd result
+    end
   end
 
   @doc """

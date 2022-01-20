@@ -62,7 +62,7 @@ channel.join()
 let shortroomInput         = document.querySelector("#shortroom-input")
 shortroomInput.addEventListener("keypress", event => {
   if(event.key === 'Enter'){
-    channel.push("mud_msg", {body: {room_short: shortroomInput.value}})
+    channel.push("mud_msg", {body: {username: "micah", room_short: shortroomInput.value, unique: "true"}})
     shortroomInput.value = ""
   }
 })

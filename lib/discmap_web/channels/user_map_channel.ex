@@ -61,12 +61,13 @@ defmodule DiscmapWeb.UserMapChannel do
         %{
           "body" => %{
             "username" => username,
-            "room_short" => room_short
+            "room_short" => room_short,
+            "unique" => _unique
           }
         },
         socket
       ) do
-    case set_room(username, room_short) do
+    case set_room(username, room_short, true) do
       {:result, result} ->
         broadcast!(socket, "mud_msg", %{
           body: %{
@@ -84,12 +85,43 @@ defmodule DiscmapWeb.UserMapChannel do
     end
   end
 
-  def set_room(username, room_short) do
+  @impl true
+  def handle_in(
+        "mud_msg",
+        %{
+          "body" => %{
+            "username" => username,
+            "room_short" => room_short
+          }
+        },
+        socket
+      ) do
+    case set_room(username, room_short, false) do
+      {:result, result} ->
+        broadcast!(socket, "mud_msg", %{
+          body: %{
+            src: result.map.filepath,
+            room_short: result.room.room_short,
+            x: result.room.xpos,
+            y: result.room.ypos
+          }
+        })
+
+        {:noreply, socket}
+
+      {:error, _any} ->
+        {:noreply, socket}
+    end
+  end
+
+  def set_room(username, room_short, unique?) do
     user = Accounts.get_user_by_username!(username)
+
+    IO.puts unique?
 
     sent_room =
       if room_short != nil do
-        Maps.get_room_by_room_short!(room_short)
+        Maps.get_room_by_room_short!(room_short, unique?)
       end
 
     if sent_room != nil do
