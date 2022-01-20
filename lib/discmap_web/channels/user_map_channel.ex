@@ -124,13 +124,14 @@ defmodule DiscmapWeb.UserMapChannel do
 
     sent_room =
       if sent_room == nil do
-        if room_short =~ ~r/a /i do
-          room_short = String.slice(room_short, 2..-1)
-          Maps.get_room_by_room_short!(room_short, unique?)
-        end
-        if room_short =~ ~r/the /i do
-          room_short = String.slice(room_short, 4..-1)
-          Maps.get_room_by_room_short!(room_short, unique?)
+        cond do
+          room_short =~ ~r/a /i ->
+            room_short = String.slice(room_short, 2..-1)
+            Maps.get_room_by_room_short!(room_short, unique?)
+
+          room_short =~ ~r/the /i ->
+            room_short = String.slice(room_short, 4..-1)
+            Maps.get_room_by_room_short!(room_short, unique?)
         end
       else
         sent_room
