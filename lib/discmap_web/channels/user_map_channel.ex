@@ -117,8 +117,6 @@ defmodule DiscmapWeb.UserMapChannel do
   def set_room(username, room_short, unique?) do
     user = Accounts.get_user_by_username!(username)
 
-    IO.puts(unique?)
-
     sent_room =
       if room_short != nil do
         Maps.get_room_by_room_short!(room_short, unique?)
@@ -126,20 +124,16 @@ defmodule DiscmapWeb.UserMapChannel do
 
     sent_room =
       if sent_room == nil do
-        # check if room_short starts with "The ", case insensitive
-        if room_short.downcase.start_with?("the ") do
-          room_short = room_short[4..-1]
+        if room_short =~ ~r/a /i do
+          room_short = String.slice(room_short, 2..-1)
           Maps.get_room_by_room_short!(room_short, unique?)
         end
-      end
-
-    sent_room =
-      if sent_room == nil do
-        # check if room_short starts with "A ", case insensitive
-        if room_short.downcase.start_with?("a ") do
-          room_short = room_short[2..-1]
+        if room_short =~ ~r/the /i do
+          room_short = String.slice(room_short, 4..-1)
           Maps.get_room_by_room_short!(room_short, unique?)
         end
+      else
+        sent_room
       end
 
     if sent_room != nil do
