@@ -117,11 +117,29 @@ defmodule DiscmapWeb.UserMapChannel do
   def set_room(username, room_short, unique?) do
     user = Accounts.get_user_by_username!(username)
 
-    IO.puts unique?
+    IO.puts(unique?)
 
     sent_room =
       if room_short != nil do
         Maps.get_room_by_room_short!(room_short, unique?)
+      end
+
+    sent_room =
+      if sent_room == nil do
+        # check if room_short starts with "The ", case insensitive
+        if room_short.downcase.start_with?("the ") do
+          room_short = room_short[4..-1]
+          Maps.get_room_by_room_short!(room_short, unique?)
+        end
+      end
+
+    sent_room =
+      if sent_room == nil do
+        # check if room_short starts with "A ", case insensitive
+        if room_short.downcase.start_with?("a ") do
+          room_short = room_short[2..-1]
+          Maps.get_room_by_room_short!(room_short, unique?)
+        end
       end
 
     if sent_room != nil do
@@ -142,19 +160,21 @@ defmodule DiscmapWeb.UserMapChannel do
           | {:result,
              %{map: any, room: atom | %{:map_id => any, :room_id => any, optional(any) => any}}}
   def change_room(username, direction) do
-    abbr_direction = case direction do
-      "north" -> "n"
-      "south" -> "s"
-      "east" -> "e"
-      "west" -> "w"
-      "northwest" -> "nw"
-      "northeast" -> "ne"
-      "southwest" -> "sw"
-      "southeast" -> "se"
-      "up" -> "u"
-      "down" -> "d"
-      _ -> direction
-    end
+    abbr_direction =
+      case direction do
+        "north" -> "n"
+        "south" -> "s"
+        "east" -> "e"
+        "west" -> "w"
+        "northwest" -> "nw"
+        "northeast" -> "ne"
+        "southwest" -> "sw"
+        "southeast" -> "se"
+        "up" -> "u"
+        "down" -> "d"
+        _ -> direction
+      end
+
     user = Accounts.get_user_by_username!(username)
 
     if user.current_room_id != nil do
