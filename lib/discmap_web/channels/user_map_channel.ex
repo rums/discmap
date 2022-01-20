@@ -132,7 +132,6 @@ defmodule DiscmapWeb.UserMapChannel do
           room_short =~ ~r/the /i ->
             new_room_short = String.slice(room_short, 4..-1)
             Maps.get_room_by_room_short!(new_room_short, unique?)
-          true -> sent_room
         end
       else
         sent_room
