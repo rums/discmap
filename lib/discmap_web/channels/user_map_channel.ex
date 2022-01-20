@@ -125,11 +125,11 @@ defmodule DiscmapWeb.UserMapChannel do
     sent_room =
       if sent_room == nil do
         cond do
-          room_short =~ ~r/a /i ->
+          room_short =~ ~r/^a /i ->
             new_room_short = String.slice(room_short, 2..-1)
             Maps.get_room_by_room_short!(new_room_short, unique?)
 
-          room_short =~ ~r/the /i ->
+          room_short =~ ~r/^the /i ->
             new_room_short = String.slice(room_short, 4..-1)
             Maps.get_room_by_room_short!(new_room_short, unique?)
         end
